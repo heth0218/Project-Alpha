@@ -6,6 +6,7 @@ import './screens/homepage.dart';
 import './screens/imagetotext.dart';
 import './screens/voicetotext.dart';
 import './providers/imageurl.dart';
+import './screens/tutorials-screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,11 +29,13 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
           accentColor: Colors.amber,
+          fontFamily: 'Helvetica',
         ),
         home: HomePage(),
         routes: {
           ImageToText.routeName: (ctx) => ImageToText(),
-          VoiceToText.routeName: (ctx) => VoiceToText()
+          VoiceToText.routeName: (ctx) => VoiceToText(),
+          TutorialsScreen.routeName: (ctx) => TutorialsScreen(),
         },
       ),
     );

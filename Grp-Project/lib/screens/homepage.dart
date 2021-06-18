@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import './voice_capture.dart';
 import './image_capture.dart';
+import '../widgets/side-drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,11 +16,13 @@ class _HomePageState extends State<HomePage> {
 
   int _selectedPageIndex = 0;
 
+  final tutorialsCall = false;
+
   @override
   void initState() {
     _pages = [
       {
-        'page': ImageCapture(),
+        'page': ImageCapture(tutorialsCall),
         'title': 'Capture Image',
       },
       {
@@ -42,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(_pages![_selectedPageIndex]['title'].toString()),
       ),
+      drawer: SideDrawer(),
       body: _pages![_selectedPageIndex]['page'],
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,

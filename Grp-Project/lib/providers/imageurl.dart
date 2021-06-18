@@ -19,7 +19,7 @@ class ImageUrl with ChangeNotifier {
   Future<Map<String, dynamic>> imageToText(String imageUrl) async {
     var url = 'https://ocr-entity-recognition.herokuapp.com/extract_data';
     try {
-      // print(imageUrl);
+      print(imageUrl);
       final response = await http.post(
         Uri.parse(url),
         body: {

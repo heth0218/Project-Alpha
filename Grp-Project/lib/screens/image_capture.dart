@@ -4,10 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'package:provider/provider.dart';
+import '../providers/imageurl.dart';
+
 import './imagetotext.dart';
 
 class ImageCapture extends StatefulWidget {
-  const ImageCapture({Key? key}) : super(key: key);
+  final tutorialCall;
+
+  ImageCapture(this.tutorialCall);
 
   @override
   _ImageCaptureState createState() => _ImageCaptureState();
@@ -18,8 +23,11 @@ class _ImageCaptureState extends State<ImageCapture> {
   File? _storedImageFile;
   final ImagePicker _picker = ImagePicker();
   var _isLoading = false;
+  String? word;
+  String? judgingVariable;
 
   Future<void> captureImage() async {
+    judgingVariable = null;
     _imageFile = await _picker.getImage(source: ImageSource.gallery);
     if (_imageFile == null) {
       return;
@@ -30,7 +38,30 @@ class _ImageCaptureState extends State<ImageCapture> {
     });
   }
 
+  void invokeApi(imageUrl) async {
+    _isLoading = true;
+    print('Hello');
+    final result = await Provider.of<ImageUrl>(context, listen: false)
+        .imageToText(imageUrl);
+    print(result['Summary']);
+    // setState(() {
+    //   word = result['Summary'];
+    // });
+    // print(word);
+    if (result['Summary'].compareTo(' Dog') == 0) {
+      setState(() {
+        judgingVariable = 'true';
+      });
+    } else {
+      setState(() {
+        judgingVariable = 'false';
+      });
+    }
+    _isLoading = false;
+  }
+
   void uploadImageButton() async {
+    judgingVariable = null;
     String fileName = p.basename(_imageFile!.path);
     var file = File(_imageFile!.path);
     var imageUrl;
@@ -51,8 +82,10 @@ class _ImageCaptureState extends State<ImageCapture> {
         _imageFile = null;
         _isLoading = false;
       });
-      Navigator.of(context)
-          .pushNamed(ImageToText.routeName, arguments: imageUrl);
+      widget.tutorialCall
+          ? invokeApi(imageUrl)
+          : Navigator.of(context)
+              .pushNamed(ImageToText.routeName, arguments: imageUrl);
     } else {
       print('No Image Path Received');
     }
@@ -60,38 +93,57 @@ class _ImageCaptureState extends State<ImageCapture> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Center(
-              child: _imageFile != null
-                  ? Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 300,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          child: Image.file(
-                            _storedImageFile!,
-                            height: 300,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: uploadImageButton,
-                          child: Text('Upload To Firebase'),
+    return Column(
+      children: [
+        Container(
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Center(
+                  child: _imageFile != null
+                      ? Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 300,
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 20),
+                              child: Image.file(
+                                _storedImageFile!,
+                                height: 300,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: uploadImageButton,
+                              child: Text('Upload Image'),
+                            )
+                          ],
                         )
-                      ],
+                      : IconButton(
+                          icon: Icon(Icons.image_outlined),
+                          onPressed: captureImage,
+                        ),
+                ),
+        ),
+        widget.tutorialCall &&
+                (judgingVariable == 'true' || judgingVariable == 'false')
+            ? Container(
+                child: Column(
+                  children: [
+                    Image.network(
+                      judgingVariable == 'true'
+                          ? 'https://png.pngtree.com/png-vector/20210212/ourmid/pngtree-green-correct-icon-png-image_2912233.jpg'
+                          : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD3dae81V0LeLMif297hj4tnpiOSC4S8zafQ&usqp=CAU',
+                      fit: BoxFit.cover,
                     )
-                  : IconButton(
-                      icon: Icon(Icons.image_outlined),
-                      onPressed: captureImage,
-                    ),
-            ),
+                  ],
+                ),
+              )
+            : Container()
+      ],
     );
   }
 }
