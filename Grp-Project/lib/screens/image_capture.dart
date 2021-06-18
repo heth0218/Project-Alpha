@@ -91,6 +91,13 @@ class _ImageCaptureState extends State<ImageCapture> {
     }
   }
 
+  void reUploadImageButton() {
+    setState(() {
+      _imageFile = null;
+      _storedImageFile = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -108,23 +115,77 @@ class _ImageCaptureState extends State<ImageCapture> {
                               width: double.infinity,
                               height: 300,
                               margin: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
+                                horizontal: 20,
+                                vertical: 20,
+                              ),
                               child: Image.file(
                                 _storedImageFile!,
                                 height: 300,
                                 width: double.infinity,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                               ),
                             ),
-                            ElevatedButton(
-                              onPressed: uploadImageButton,
-                              child: Text('Upload Image'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: reUploadImageButton,
+                                  label: Text('Re-Upload Image'),
+                                  icon: Icon(Icons.cancel),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.all(8),
+                                    textStyle: TextStyle(fontSize: 10),
+                                  ),
+                                ),
+                                ElevatedButton.icon(
+                                  onPressed: uploadImageButton,
+                                  label: Text('Upload Image'),
+                                  icon: Icon(Icons.check),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.all(8),
+                                    textStyle: TextStyle(fontSize: 10),
+                                  ),
+                                ),
+                              ],
                             )
                           ],
                         )
-                      : IconButton(
-                          icon: Icon(Icons.image_outlined),
-                          onPressed: captureImage,
+                      : Container(
+                          margin: widget.tutorialCall
+                              ? EdgeInsets.all(0)
+                              : EdgeInsets.fromLTRB(
+                                  0,
+                                  MediaQuery.of(context).size.height * 0.4,
+                                  0,
+                                  0,
+                                ),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Choose an Image',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                child: ElevatedButton.icon(
+                                  onPressed: captureImage,
+                                  icon: Icon(Icons.image_outlined),
+                                  label: Text('Select From Gallery'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.all(10),
+                                    textStyle: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // child: IconButton(
+                          //   icon: Icon(Icons.image_outlined),
+                          //   onPressed: captureImage,
+                          // ),
                         ),
                 ),
         ),
