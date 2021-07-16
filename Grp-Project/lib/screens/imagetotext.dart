@@ -31,7 +31,8 @@ class _ImageToTextState extends State<ImageToText> {
   double rate = 0.5;
   bool isCurrentLanguageInstalled = false;
 
-  String? _newVoiceText;
+  // String? _newVoiceText;
+  String? _speechText;
 
   // TtsState ttsState = TtsState.stopped;
 
@@ -118,10 +119,10 @@ class _ImageToTextState extends State<ImageToText> {
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
 
-    if (_newVoiceText != null) {
-      if (_newVoiceText!.isNotEmpty) {
+    if (_speechText != null) {
+      if (_speechText!.isNotEmpty) {
         await flutterTts.awaitSpeakCompletion(true);
-        await flutterTts.speak(_newVoiceText!);
+        await flutterTts.speak(_speechText!);
       }
     }
   }
@@ -183,7 +184,7 @@ class _ImageToTextState extends State<ImageToText> {
 
   void _onChange(String text) {
     setState(() {
-      _newVoiceText = text;
+      _speechText = text;
     });
   }
 
@@ -192,12 +193,10 @@ class _ImageToTextState extends State<ImageToText> {
     if (_isInit) {
       var url = ModalRoute.of(context)!.settings.arguments as String;
       data = await Provider.of<ImageUrl>(context).imageToText(url);
+      _speechText = data['Summary'];
       keys = data['Entity_Images'].keys.toList();
       values = data['Entity_Images'].values.toList();
-      _newVoiceText = data['Recognized Lines'].join(" ").toString();
-      // print(keys.length);
-      // print(keys);
-      // print(values);
+      // _newVoiceText = data['Recognized Lines'].join(" ").toString();
       setState(() {
         _isLoading = false;
       });
@@ -356,7 +355,7 @@ class _ImageToTextState extends State<ImageToText> {
       alignment: Alignment.topCenter,
       padding: EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
       child: TextFormField(
-        initialValue: _newVoiceText,
+        initialValue: data['Summary'],
         onChanged: (String value) {
           _onChange(value);
         },

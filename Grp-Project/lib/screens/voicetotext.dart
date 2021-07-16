@@ -31,7 +31,8 @@ class _VoiceToTextState extends State<VoiceToText> {
   double rate = 0.5;
   bool isCurrentLanguageInstalled = false;
 
-  String? _newVoiceText;
+  // String? _newVoiceText;
+  String? _speechText;
 
   // TtsState ttsState = TtsState.stopped;
 
@@ -118,10 +119,10 @@ class _VoiceToTextState extends State<VoiceToText> {
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
 
-    if (_newVoiceText != null) {
-      if (_newVoiceText!.isNotEmpty) {
+    if (_speechText != null) {
+      if (_speechText!.isNotEmpty) {
         await flutterTts.awaitSpeakCompletion(true);
-        await flutterTts.speak(_newVoiceText!);
+        await flutterTts.speak(_speechText!);
       }
     }
   }
@@ -183,7 +184,7 @@ class _VoiceToTextState extends State<VoiceToText> {
 
   void _onChange(String text) {
     setState(() {
-      _newVoiceText = text;
+      _speechText = text;
     });
   }
 
@@ -194,7 +195,7 @@ class _VoiceToTextState extends State<VoiceToText> {
       data = await Provider.of<ImageUrl>(context).voiceToText(lastwords);
       keys = data['Entity_Images'].keys.toList();
       values = data['Entity_Images'].values.toList();
-      _newVoiceText = data['Recognized Lines'].toString();
+      // _newVoiceText = data['Recognized Lines'].toString();
       // print(keys.length);
       // print(keys);
       // print(values);
@@ -356,7 +357,7 @@ class _VoiceToTextState extends State<VoiceToText> {
       alignment: Alignment.topCenter,
       padding: EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
       child: TextFormField(
-        initialValue: _newVoiceText,
+        initialValue: _speechText,
         onChanged: (String value) {
           _onChange(value);
         },
